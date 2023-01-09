@@ -56,7 +56,6 @@ class PizzaTypeListAdapter(private val typeSelectionStateDataSource: (PizzaType)
         val colorStr = if (isSelected) "#FFAAAA" else "#FFFFFF"
         holder.binding.root.setBackgroundColor(Color.parseColor(colorStr))
     }
-
 }
 
 

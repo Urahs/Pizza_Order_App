@@ -1,12 +1,62 @@
 package com.example.sicakpizzalar
 
+import android.graphics.Color
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
+import androidx.recyclerview.widget.RecyclerView
 import com.example.sicakpizzalar.databinding.FragmentToppingsBinding
+import com.example.sicakpizzalar.databinding.ItemPizzaTypeBinding
+import com.example.sicakpizzalar.databinding.ItemToppingBinding
+
+class ToppingsListDiffCallback(private val toppingsSelectionStateDataSource: (ToppingsType) -> (Boolean)): DiffUtil.ItemCallback<ToppingsType>() {
+    override fun areItemsTheSame(oldItem: ToppingsType, newItem: ToppingsType): Boolean {
+        return oldItem == newItem
+    }
+
+    override fun areContentsTheSame(oldItem: ToppingsType, newItem: ToppingsType): Boolean {
+        return toppingsSelectionStateDataSource(oldItem) == toppingsSelectionStateDataSource(newItem)
+    }
+}
+
+
+class ToppingsListAdapter(private val toppingsSelectionStateDataSource: (ToppingsType) -> (Boolean),
+                           private val itemSelectionHandler: (ToppingsType) -> (Unit)): ListAdapter<ToppingsType, ToppingsListAdapter.ToppingsViewHolder>(ToppingsListDiffCallback(toppingsSelectionStateDataSource)) {
+
+    class ToppingsViewHolder(val binding: ItemToppingBinding): RecyclerView.ViewHolder(binding.root) {
+        lateinit var type: ToppingsType
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ToppingsViewHolder {
+        val binding = ItemToppingBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        val holder = ToppingsViewHolder(binding)
+        holder.binding.root.setOnClickListener {
+            itemSelectionHandler(holder.type)
+        }
+        return holder
+    }
+
+    override fun onBindViewHolder(holder: ToppingsViewHolder, position: Int) {
+        val ctx = holder.itemView.context
+        val type = getItem(position)
+        holder.type = type
+
+        val toppingName = ctx.getString(type.getToppingsTypeNameResourceID())
+
+        holder.binding.toppingNameTV.text = "$toppingName"
+
+        val isSelected = toppingsSelectionStateDataSource(type)
+        val colorStr = if (isSelected) "#FFAAAA" else "#FFFFFF"
+        holder.binding.root.setBackgroundColor(Color.parseColor(colorStr))
+    }
+}
+
+
 
 class ToppingsFragment : Fragment() {
 
@@ -14,6 +64,8 @@ class ToppingsFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val orderViewModel: OrderViewModel by activityViewModels()
+
+    private var listAdapter: ToppingsListAdapter? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -30,14 +82,20 @@ class ToppingsFragment : Fragment() {
             onNextButtonTapped()
         }
 
-
-        // Temporary
-        var toppingNamesStr: String = ""
-        orderViewModel.toppingTypes.forEach { t ->
-            toppingNamesStr += getString(t.getToppingsTypeNameResourceID()) + " (+ ${t.getPrice()} TL) \n"
+        orderViewModel.isProgressAllowed.observe(viewLifecycleOwner) { allowed ->
+            binding.nextButton.isEnabled = allowed
         }
 
-        binding.textView.text = toppingNamesStr
+        listAdapter = ToppingsListAdapter(::isTypeSelected) { selectedPizzaType ->
+            processPizzaTypeSelection(selectedPizzaType)
+        }
+
+        binding.typesRecyclerView.adapter = listAdapter
+        listAdapter!!.submitList(orderViewModel.toppingTypes)
+        listAdapter!!.notifyDataSetChanged()
+
+
+
     }
 
     private fun onNextButtonTapped() {

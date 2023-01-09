@@ -119,6 +119,7 @@ class OrderViewModel: ViewModel() {
         PizzaType.MIXED,
         PizzaType.VEGAN
     )
+
     private var selectedPizzaType: PizzaType? = null
 
     val doughTypes: List<DoughType> = listOf(

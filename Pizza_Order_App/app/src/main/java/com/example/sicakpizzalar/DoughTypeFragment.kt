@@ -48,7 +48,6 @@ class DoughTypeListAdapter(private val doughTypeSelectionStateDataSource: (Dough
         holder.type = type
 
         val doughTypeName = ctx.getString(type.getDoughTypeNameResourceID())
-
         holder.binding.doughTypeTV.text = "$doughTypeName"
 
         val isSelected = doughTypeSelectionStateDataSource(type)
