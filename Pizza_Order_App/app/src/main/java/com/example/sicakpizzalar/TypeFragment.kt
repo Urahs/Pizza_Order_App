@@ -119,7 +119,6 @@ class TypeFragment : Fragment() {
         binding.priceTV.text = totalPrice
     }
 
-
     private fun onNextButtonTapped() {
         orderViewModel.progress()
     }

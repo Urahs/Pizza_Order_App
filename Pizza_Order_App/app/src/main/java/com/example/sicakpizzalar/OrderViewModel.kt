@@ -83,7 +83,11 @@ class OrderViewModel: ViewModel() {
                 progressConditionHandler = ::progressFromTypeSelectionAllowed
             }
         )
-        addItem(OrderNavigationItem(OrderStep.DOUGH_TYPE))
+        addItem(
+            OrderNavigationItem(OrderStep.DOUGH_TYPE).apply {
+                progressConditionHandler = ::progressFromDoughTypeSelectionAllowed
+            }
+        )
         addItem(OrderNavigationItem(OrderStep.TOPPINGS))
         addItem(
             OrderNavigationItem(OrderStep.SUMMARY).apply {
@@ -147,18 +151,27 @@ class OrderViewModel: ViewModel() {
         return type == selectedPizzaType
     }
 
+    private fun isPizzaTypeSelected(): Boolean {
+        return selectedPizzaType != null
+    }
+
     fun selectPizzaType(type: PizzaType) {
         selectedPizzaType = type
         calculateTotalPriceAndNotify()
         _isProgressAllowed.value = progressFromTypeSelectionAllowed()
     }
 
+    fun selectDoughType(type: DoughType) {
+        selectedDoughType = type
+        _isProgressAllowed.value =  progressFromDoughTypeSelectionAllowed()
+    }
+
     fun cancelOrder() {
         orderNavigation.reset()
     }
 
-    private fun isPizzaTypeSelected(): Boolean {
-        return selectedPizzaType != null
+    fun isDoughTypeSelected(type: DoughType): Boolean {
+        return type == selectedDoughType
     }
 
     private fun isDoughTypeSelected(): Boolean {
@@ -167,6 +180,10 @@ class OrderViewModel: ViewModel() {
 
     private fun progressFromTypeSelectionAllowed(): Boolean {
         return isPizzaTypeSelected()
+    }
+
+    private fun progressFromDoughTypeSelectionAllowed(): Boolean {
+        return isDoughTypeSelected()
     }
 
     private fun calculateTotalPriceAndNotify() {
