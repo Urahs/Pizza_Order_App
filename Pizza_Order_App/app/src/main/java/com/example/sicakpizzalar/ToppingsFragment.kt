@@ -2,6 +2,7 @@ package com.example.sicakpizzalar
 
 import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -47,8 +48,9 @@ class ToppingsListAdapter(private val toppingsSelectionStateDataSource: (Topping
         holder.type = type
 
         val toppingName = ctx.getString(type.getToppingsTypeNameResourceID())
+        val toppingPrice = ctx.getString(R.string.format_price, type.getPrice())
 
-        holder.binding.toppingNameTV.text = "$toppingName"
+        holder.binding.toppingNameTV.text = "$toppingName - $toppingPrice"
 
         val isSelected = toppingsSelectionStateDataSource(type)
         val colorStr = if (isSelected) "#FFAAAA" else "#FFFFFF"
@@ -82,20 +84,38 @@ class ToppingsFragment : Fragment() {
             onNextButtonTapped()
         }
 
+        orderViewModel.totalPrice.observe(viewLifecycleOwner) { totalPrice ->
+            setPriceText(totalPrice)
+        }
+
         orderViewModel.isProgressAllowed.observe(viewLifecycleOwner) { allowed ->
             binding.nextButton.isEnabled = allowed
         }
 
-        listAdapter = ToppingsListAdapter(::isTypeSelected) { selectedPizzaType ->
-            processPizzaTypeSelection(selectedPizzaType)
+        listAdapter = ToppingsListAdapter(::isToppingSelected) { selectedPizzaType ->
+            processToppingSelection(selectedPizzaType)
         }
 
         binding.typesRecyclerView.adapter = listAdapter
         listAdapter!!.submitList(orderViewModel.toppingTypes)
         listAdapter!!.notifyDataSetChanged()
+    }
 
+    private fun isToppingSelected(type: ToppingsType): Boolean {
+        return orderViewModel.isToppingSelected(type)
+    }
 
+    private fun processToppingSelection(type: ToppingsType) {
+        Log.d("TypeFragment", "Pizza Selected: $type")
+        orderViewModel.selectTopping(type)
+        listAdapter?.submitList(orderViewModel.toppingTypes)
+        listAdapter?.notifyDataSetChanged()
+    }
 
+    private fun setPriceText(price: Int) {
+        val priceStr = getString(R.string.format_price, price)
+        val totalPrice = getString(R.string.format_total_price, priceStr)
+        binding.priceTV.text = totalPrice
     }
 
     private fun onNextButtonTapped() {

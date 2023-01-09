@@ -17,7 +17,6 @@ class OrderNavigationItem(val step: OrderStep) {
     fun allowsProgress(): Boolean {
         return (progressConditionHandler?.invoke() ?: true)
     }
-
 }
 
 
@@ -156,9 +155,21 @@ class OrderViewModel: ViewModel() {
         return selectedPizzaType != null
     }
 
+    fun isDoughTypeSelected(type: DoughType): Boolean {
+        return type == selectedDoughType
+    }
+
+    private fun isDoughTypeSelected(): Boolean {
+        return selectedDoughType != null
+    }
+
+    fun isToppingSelected(type: ToppingsType): Boolean {
+        return type in selectedToppingTypes
+    }
+
     fun selectPizzaType(type: PizzaType) {
         selectedPizzaType = type
-        calculateTotalPriceAndNotify()
+        calculateTotalPriceAndNotifyForPizzaType()
         _isProgressAllowed.value = progressFromTypeSelectionAllowed()
     }
 
@@ -167,16 +178,19 @@ class OrderViewModel: ViewModel() {
         _isProgressAllowed.value =  progressFromDoughTypeSelectionAllowed()
     }
 
+    fun selectTopping(type: ToppingsType) {
+        if(type in selectedToppingTypes){
+            selectedToppingTypes.remove(type)
+            addToppingPriceToTotalPrice( -type.getPrice() )
+        }
+        else{
+            selectedToppingTypes.add(type)
+            addToppingPriceToTotalPrice( type.getPrice() )
+        }
+    }
+
     fun cancelOrder() {
         orderNavigation.reset()
-    }
-
-    fun isDoughTypeSelected(type: DoughType): Boolean {
-        return type == selectedDoughType
-    }
-
-    private fun isDoughTypeSelected(): Boolean {
-        return selectedDoughType != null
     }
 
     private fun progressFromTypeSelectionAllowed(): Boolean {
@@ -187,10 +201,13 @@ class OrderViewModel: ViewModel() {
         return isDoughTypeSelected()
     }
 
-    private fun calculateTotalPriceAndNotify() {
-        var sum = 0
-        sum += selectedPizzaType?.getPrice() ?: 0
+    private fun calculateTotalPriceAndNotifyForPizzaType() {
+        var sum = selectedPizzaType?.getPrice() ?: 0
         _totalPrice.value = sum
+    }
+
+    private fun addToppingPriceToTotalPrice(price: Int) {
+        _totalPrice.value = _totalPrice.value?.plus(price)
     }
 
     private fun postNavigationHandler() {
@@ -199,5 +216,4 @@ class OrderViewModel: ViewModel() {
         _isBackProgressAllowed.value = orderNavigation.currentBackProgressAllowance
         _isProgressAllowed.value = orderNavigation.progressAllowance
     }
-
 }
