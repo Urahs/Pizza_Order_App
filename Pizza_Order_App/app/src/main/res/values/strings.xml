@@ -1,0 +1,32 @@
+<resources>
+    <string name="app_name">SicakPizzalar</string>
+
+    <string name="title_button_start">Basla</string>
+    <string name="title_button_next">Ilerle</string>
+    <string name="title_button_back">Geri</string>
+    <string name="title_button_cancel">Iptal</string>
+    <string name="title_button_order">Siparis Ver</string>
+
+    <string name="pizza_type_margarita">Margarita</string>
+    <string name="pizza_type_pepperoni">Biberli</string>
+    <string name="pizza_type_mixed">Karisik</string>
+    <string name="pizza_type_vegan">Vegan</string>
+
+    <string name="dough_type_thin">Ince Kenarli</string>
+    <string name="dough_type_thick">Kalin Kenarli</string>
+    <string name="dough_type_extra_thick">Daha da Kalin Kenarli</string>
+
+    <string name="topping_type_corn">Misir</string>
+    <string name="topping_type_mushroom">Mantar</string>
+    <string name="topping_type_olive">Zeytin</string>
+    <string name="topping_type_tomato">Domates</string>
+    <string name="topping_type_cheese">Peynir</string>
+
+    <string name="format_total_price">Toplam Tutar: %1$s</string>
+    <string name="format_price">%1$d YTL</string>
+
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+</resources>
