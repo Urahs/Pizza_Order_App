@@ -31,9 +31,21 @@ class InitialFragment : Fragment() {
             onStartButtonTapped()
         }
 
+        binding.goCartButton.setOnClickListener {
+            onGoCartButton()
+        }
+
         orderViewModel.isProgressAllowed.observe(viewLifecycleOwner) { allowed ->
             binding.startButton.isEnabled = allowed
         }
+
+        orderViewModel.isOrderAllowed.observe(viewLifecycleOwner) { allowed ->
+            binding.goCartButton.isEnabled = allowed
+        }
+    }
+
+    private fun onGoCartButton() {
+        orderViewModel.openCartScreen()
     }
 
     private fun onStartButtonTapped() {

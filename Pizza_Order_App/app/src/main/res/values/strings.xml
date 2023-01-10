@@ -6,6 +6,7 @@
     <string name="title_button_back">Geri</string>
     <string name="title_button_cancel">Iptal</string>
     <string name="title_button_order">Siparis Ver</string>
+    <string name="title_button_go_cart">Sepete Git</string>
     <string name="title_button_add_new_pizza">Yeni Pizza Ekle</string>
     <string name="title_button_add_pizza_item">Ekle ve Sepete Git</string>
 

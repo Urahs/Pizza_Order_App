@@ -1,15 +1,16 @@
 package com.example.sicakpizzalar
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import java.text.FieldPosition
 
 
 typealias PostNavigationHandler = () -> (Unit)
 typealias NavigationProgressConditionHandler = () -> (Boolean)
 
 data class PizzaOrder(
-    //var orderNumber: Int,
     var pizzaType: PizzaType?,
     var doughType: DoughType?,
     var toppingTypes: MutableSet<ToppingsType>,
@@ -32,12 +33,16 @@ class OrderNavigationItem(val step: OrderStep) {
 class OrderNavigation {
     private var items: MutableList<OrderNavigationItem> = mutableListOf()
     private var currentStepIndex = 0
+    val firstStepOfPizzaSelection = OrderStep.PIZZA_TYPE
+    val cartStep = OrderStep.CART
 
     val currentStep: OrderStep get() = items[currentStepIndex].step
     val currentCancellationAllowance get() = items[currentStepIndex].allowsCancellation
     val currentBackProgressAllowance get() = items[currentStepIndex].allowsGoingToPreviousStep
     val progressAllowance get() = items[currentStepIndex].allowsProgress()
     val cancelCurrentSelection get() = items[currentStepIndex].goBackConditionHandler
+
+    var clearOrderList: (() -> Unit)? = null
 
     private var postNavigationHandlers: MutableList<PostNavigationHandler> = mutableListOf()
 
@@ -59,24 +64,28 @@ class OrderNavigation {
     }
 
     fun cancel() {
+
+        if(items[currentStepIndex].step == cartStep){
+            clearOrderList?.invoke()
+        }
+
         items.forEach { item->
             item.goBackConditionHandler?.invoke()
         }
         changeNavigation(0)
     }
 
-    fun reset(firstStepOfPizzaSelection: OrderStep){
+    fun reset(){
         items.forEach { item->
             item.goBackConditionHandler?.invoke()
         }
 
-        for (i in items.indices)
-            if (items[i].step == firstStepOfPizzaSelection){
-                changeNavigation(i)
-                break
-            }
+        changeNavigation( getStepIndex(firstStepOfPizzaSelection) )
     }
 
+    fun openCartScreen(){
+        changeNavigation( getStepIndex(cartStep) )
+    }
 
     private fun changeNavigation(targetIndex: Int) {
 
@@ -93,6 +102,10 @@ class OrderNavigation {
 
     private fun isTargetIndexInvalid(targetIndex: Int): Boolean {
         return targetIndex < 0 || targetIndex >= items.size
+    }
+
+    private fun getStepIndex(step: OrderStep): Int{
+        return items.indexOfFirst { i -> i.step == step }
     }
 }
 
@@ -134,16 +147,19 @@ class OrderViewModel: ViewModel() {
         )
 
         addPostNavigationHandler(::postNavigationHandler)
+        clearOrderList = ::clearOrders
     }
 
     var pizzaOrderList = mutableListOf<PizzaOrder>()
-    var firstStepOfPizzaSelection = OrderStep.PIZZA_TYPE
 
     private val _isBackProgressAllowed: MutableLiveData<Boolean> = MutableLiveData(false)
     val isBackProgressAllowed: LiveData<Boolean> = _isBackProgressAllowed
 
     private val _isCancelAllowed: MutableLiveData<Boolean> = MutableLiveData(false)
     val isCancelAllowed: LiveData<Boolean> = _isCancelAllowed
+
+    private val _isOrderAllowed: MutableLiveData<Boolean> = MutableLiveData(false)
+    val isOrderAllowed: LiveData<Boolean> = _isOrderAllowed
 
     private val _isProgressAllowed: MutableLiveData<Boolean> = MutableLiveData(orderNavigation.progressAllowance)
     val isProgressAllowed: LiveData<Boolean> = _isProgressAllowed
@@ -283,12 +299,13 @@ class OrderViewModel: ViewModel() {
         val order = PizzaOrder(
             selectedPizzaType,
             selectedDoughType,
-            selectedToppingTypes,
+            selectedToppingTypes.toMutableSet(),
             _pizzaPrice.value
         )
         pizzaOrderList.add(order)
 
         _totalPrice.value = _pizzaPrice.value?.let { _totalPrice.value?.plus(it) }
+        updateOrderAllowed()
     }
 
     private fun postNavigationHandler() {
@@ -298,7 +315,30 @@ class OrderViewModel: ViewModel() {
         _isProgressAllowed.value = orderNavigation.progressAllowance
     }
 
-    fun resetOrder(firstStepOfPizzaSelection: OrderStep) {
-        orderNavigation.reset(firstStepOfPizzaSelection)
+    fun resetOrder() {
+        orderNavigation.reset()
+    }
+
+    fun deleteOrderFromPizzaOrderList(position: Int){
+        pizzaOrderList.get(position).pizzaPrice?.let {
+            _totalPrice.value = _totalPrice.value!!.minus(it)
+        }
+        pizzaOrderList.removeAt(position)
+
+        updateOrderAllowed()
+    }
+
+    private fun updateOrderAllowed(){
+        _isOrderAllowed.value = if(pizzaOrderList.size != 0) true else false
+    }
+
+    fun openCartScreen(){
+        orderNavigation.openCartScreen()
+    }
+
+    private fun clearOrders(){
+        pizzaOrderList.clear()
+        updateOrderAllowed()
+        _totalPrice.value = 0
     }
 }

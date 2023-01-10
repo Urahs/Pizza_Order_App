@@ -24,7 +24,7 @@ class CartListDiffCallback(): DiffUtil.ItemCallback<PizzaOrder>() {
 }
 
 
-class CartListAdapter(): ListAdapter<PizzaOrder, CartListAdapter.CartViewHolder>(CartListDiffCallback()) {
+class CartListAdapter(var deleteItemFromOrderList: (Int) -> (Unit)): ListAdapter<PizzaOrder, CartListAdapter.CartViewHolder>(CartListDiffCallback()) {
 
     class CartViewHolder(val binding: ItemPizzaBinding): RecyclerView.ViewHolder(binding.root) {
 
@@ -38,6 +38,11 @@ class CartListAdapter(): ListAdapter<PizzaOrder, CartListAdapter.CartViewHolder>
     }
 
     override fun onBindViewHolder(holder: CartViewHolder, position: Int) {
+
+        holder.binding.deleteItemButton.setOnClickListener {
+            deleteItemFromOrderList(position)
+        }
+
         val ctx = holder.itemView.context
         val order = getItem(position)
 
@@ -52,13 +57,11 @@ class CartListAdapter(): ListAdapter<PizzaOrder, CartListAdapter.CartViewHolder>
         }
 
         holder.binding.pizzaTypeTV.text = "$pizzaName"
-        //holder.binding.pizzaNumberTV.text = "${order.orderNumber}"
         holder.binding.pizzaNumberTV.text = "${position+1}"
         holder.binding.priceTV.text = pizzaPrice
         holder.binding.doughTypeTV.text = doughType
         holder.binding.toppingsTV.text = toppings
     }
-
 }
 
 
@@ -95,7 +98,11 @@ class CartFragment : Fragment() {
             setPriceText(totalPrice)
         }
 
-        listAdapter = CartListAdapter()
+        orderViewModel.isOrderAllowed.observe(viewLifecycleOwner) { allowed ->
+            binding.orderButton.isEnabled = allowed
+        }
+
+        listAdapter = CartListAdapter(::deleteItem)
 
         binding.typesRecyclerView.adapter = listAdapter
         listAdapter!!.submitList(orderViewModel.pizzaOrderList)
@@ -103,7 +110,7 @@ class CartFragment : Fragment() {
     }
 
     private fun onAddNewPizzaItemButton() {
-        orderViewModel.resetOrder(orderViewModel.firstStepOfPizzaSelection)
+        orderViewModel.resetOrder()
     }
 
     private fun setPriceText(price: Int) {
@@ -114,6 +121,11 @@ class CartFragment : Fragment() {
 
     private fun onOrderButtonTapped() {
         //TODO
+    }
+
+    private fun deleteItem(position: Int){
+        orderViewModel.deleteOrderFromPizzaOrderList(position)
+        listAdapter!!.notifyDataSetChanged()
     }
 
     override fun onDestroyView() {

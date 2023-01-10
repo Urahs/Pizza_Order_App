@@ -57,6 +57,7 @@
         android:id="@+id/doughTypeTV"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:paddingBottom="12dp"
         android:text="TextView"
         android:textColor="@android:color/holo_red_dark"
         android:textSize="20sp"
@@ -67,7 +68,6 @@
         android:id="@+id/toppingsTitleTV"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
         android:text="@string/toppings_string"
         android:textColor="@color/black"
         android:textSize="20sp"
@@ -78,6 +78,7 @@
         android:id="@+id/toppingsTV"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:paddingBottom="12dp"
         android:text="TextView"
         android:textColor="@android:color/holo_red_dark"
         android:textSize="20sp"
@@ -107,12 +108,18 @@
         app:layout_constraintEnd_toEndOf="parent" />
 
     <View
+        android:id="@+id/upperLine"
+        android:layout_width="match_parent"
+        android:layout_height="3dp"
+        android:background="#000000"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:layout_editor_absoluteX="0dp" />
+
+    <View
         android:id="@+id/bottomLine"
         android:layout_width="match_parent"
         android:layout_height="3dp"
-        android:layout_marginTop="10dp"
-        android:background="#000000"
-        app:layout_constraintTop_toBottomOf="@+id/toppingsTV"
+        app:layout_constraintBottom_toBottomOf="parent"
         tools:layout_editor_absoluteX="0dp" />
 
     <ImageButton
