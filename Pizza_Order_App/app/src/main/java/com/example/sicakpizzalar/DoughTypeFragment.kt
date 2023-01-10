@@ -100,7 +100,6 @@ class DoughTypeFragment : Fragment() {
     }
 
     private fun processDoughTypeSelection(type: DoughType) {
-        Log.d("DoughTypeFragment", "Dough Selected: $type")
         orderViewModel.selectDoughType(type)
         listAdapter?.submitList(orderViewModel.doughTypes)
         listAdapter?.notifyDataSetChanged()

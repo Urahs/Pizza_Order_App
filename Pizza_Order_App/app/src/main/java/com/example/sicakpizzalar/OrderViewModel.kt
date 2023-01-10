@@ -1,10 +1,8 @@
 package com.example.sicakpizzalar
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import java.text.FieldPosition
 
 
 typealias PostNavigationHandler = () -> (Unit)
@@ -240,8 +238,8 @@ class OrderViewModel: ViewModel() {
     }
 
     fun selectPizzaType(type: PizzaType) {
+        calculatePizzaPriceAndNotifyForPizzaType(type)
         selectedPizzaType = type
-        calculateTotalPriceAndNotifyForPizzaType()
         _isProgressAllowed.value = progressFromTypeSelectionAllowed()
     }
 
@@ -273,9 +271,20 @@ class OrderViewModel: ViewModel() {
         return isDoughTypeSelected()
     }
 
-    private fun calculateTotalPriceAndNotifyForPizzaType() {
-        var sum = selectedPizzaType?.getPrice() ?: 0
-        _pizzaPrice.value = sum
+    private fun calculatePizzaPriceAndNotifyForPizzaType(clickedPizzaType: PizzaType) {
+
+        if(selectedPizzaType == null){
+            _pizzaPrice.value = clickedPizzaType.getPrice()
+        }
+        else{
+            var sum = _pizzaPrice.value!!
+            if(clickedPizzaType != selectedPizzaType){
+                sum += clickedPizzaType.getPrice()
+                sum -= selectedPizzaType!!.getPrice()
+            }
+
+            _pizzaPrice.value = sum
+        }
     }
 
     private fun addToppingPriceToTotalPrice(price: Int) {
@@ -316,10 +325,9 @@ class OrderViewModel: ViewModel() {
         else
             pizzaOrderList.add(order)
 
-        ////////////////////////////////////////////////////////// TODO
         pizzaCount = 1
         editPizzaOrderIndex = -1
-        _totalPrice.value = _pizzaPrice.value?.let { _totalPrice.value?.plus(it) }
+        _totalPrice.value = _totalPrice.value?.plus(_pizzaPrice.value!! * order.pizzaCount)
         updateOrderAllowed()
     }
 
