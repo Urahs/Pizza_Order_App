@@ -12,7 +12,6 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.sicakpizzalar.databinding.FragmentToppingsBinding
-import com.example.sicakpizzalar.databinding.ItemPizzaTypeBinding
 import com.example.sicakpizzalar.databinding.ItemToppingBinding
 
 class ToppingsListDiffCallback(private val toppingsSelectionStateDataSource: (ToppingsType) -> (Boolean)): DiffUtil.ItemCallback<ToppingsType>() {
@@ -84,7 +83,7 @@ class ToppingsFragment : Fragment() {
             onNextButtonTapped()
         }
 
-        orderViewModel.totalPrice.observe(viewLifecycleOwner) { totalPrice ->
+        orderViewModel.pizzaPrice.observe(viewLifecycleOwner) { totalPrice ->
             setPriceText(totalPrice)
         }
 

@@ -6,8 +6,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
-import androidx.transition.Visibility
-import com.example.sicakpizzalar.databinding.FragmentInitialBinding
 import com.example.sicakpizzalar.databinding.FragmentSummaryBinding
 
 class SummaryFragment : Fragment() {
@@ -29,10 +27,10 @@ class SummaryFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         binding.orderButton.setOnClickListener {
-            onOrderButtonTapped()
+            onAddAndGoCart()
         }
 
-        orderViewModel.totalPrice.observe(viewLifecycleOwner) { totalPrice ->
+        orderViewModel.pizzaPrice.observe(viewLifecycleOwner) { totalPrice ->
             setPriceText(totalPrice)
         }
 
@@ -56,7 +54,8 @@ class SummaryFragment : Fragment() {
         binding.priceTV.text = totalPrice
     }
 
-    private fun onOrderButtonTapped() {
+    private fun onAddAndGoCart() {
+        orderViewModel.addPizzaOrderToCart()
         orderViewModel.progress()
     }
 

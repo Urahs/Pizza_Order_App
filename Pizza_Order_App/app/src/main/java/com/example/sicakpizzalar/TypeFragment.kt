@@ -84,7 +84,7 @@ class TypeFragment : Fragment() {
             onNextButtonTapped()
         }
 
-        orderViewModel.totalPrice.observe(viewLifecycleOwner) { totalPrice ->
+        orderViewModel.pizzaPrice.observe(viewLifecycleOwner) { totalPrice ->
             setPriceText(totalPrice)
         }
 

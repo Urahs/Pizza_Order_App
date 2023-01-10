@@ -8,6 +8,14 @@ import androidx.lifecycle.ViewModel
 typealias PostNavigationHandler = () -> (Unit)
 typealias NavigationProgressConditionHandler = () -> (Boolean)
 
+data class PizzaOrder(
+    //var orderNumber: Int,
+    var pizzaType: PizzaType?,
+    var doughType: DoughType?,
+    var toppingTypes: MutableSet<ToppingsType>,
+    var pizzaPrice: Int?
+)
+
 class OrderNavigationItem(val step: OrderStep) {
     var allowsGoingToPreviousStep = true
     var allowsCancellation = false
@@ -50,12 +58,25 @@ class OrderNavigation {
         changeNavigation(currentStepIndex - 1)
     }
 
-    fun reset() {
+    fun cancel() {
         items.forEach { item->
             item.goBackConditionHandler?.invoke()
         }
         changeNavigation(0)
     }
+
+    fun reset(firstStepOfPizzaSelection: OrderStep){
+        items.forEach { item->
+            item.goBackConditionHandler?.invoke()
+        }
+
+        for (i in items.indices)
+            if (items[i].step == firstStepOfPizzaSelection){
+                changeNavigation(i)
+                break
+            }
+    }
+
 
     private fun changeNavigation(targetIndex: Int) {
 
@@ -105,10 +126,18 @@ class OrderViewModel: ViewModel() {
                 allowsCancellation = true
             }
         )
-        addItem(OrderNavigationItem(OrderStep.CART))
+        addItem(
+            OrderNavigationItem(OrderStep.CART).apply {
+                allowsGoingToPreviousStep = false
+                allowsCancellation = true
+            }
+        )
 
         addPostNavigationHandler(::postNavigationHandler)
     }
+
+    var pizzaOrderList = mutableListOf<PizzaOrder>()
+    var firstStepOfPizzaSelection = OrderStep.PIZZA_TYPE
 
     private val _isBackProgressAllowed: MutableLiveData<Boolean> = MutableLiveData(false)
     val isBackProgressAllowed: LiveData<Boolean> = _isBackProgressAllowed
@@ -121,6 +150,9 @@ class OrderViewModel: ViewModel() {
 
     private val _navigation: MutableLiveData<OrderStep> = MutableLiveData(orderNavigation.currentStep)
     val navigation: LiveData<OrderStep> = _navigation
+
+    private val _pizzaPrice: MutableLiveData<Int> = MutableLiveData(0)
+    val pizzaPrice: LiveData<Int> = _pizzaPrice
 
     private val _totalPrice: MutableLiveData<Int> = MutableLiveData(0)
     val totalPrice: LiveData<Int> = _totalPrice
@@ -207,7 +239,7 @@ class OrderViewModel: ViewModel() {
     }
 
     fun cancelOrder() {
-        orderNavigation.reset()
+        orderNavigation.cancel()
     }
 
     private fun progressFromTypeSelectionAllowed(): Boolean {
@@ -220,16 +252,16 @@ class OrderViewModel: ViewModel() {
 
     private fun calculateTotalPriceAndNotifyForPizzaType() {
         var sum = selectedPizzaType?.getPrice() ?: 0
-        _totalPrice.value = sum
+        _pizzaPrice.value = sum
     }
 
     private fun addToppingPriceToTotalPrice(price: Int) {
-        _totalPrice.value = _totalPrice.value?.plus(price)
+        _pizzaPrice.value = _pizzaPrice.value?.plus(price)
     }
 
     private fun cancelSelectionForPizzaType(){
         if(selectedPizzaType != null){
-            _totalPrice.value = _totalPrice.value?.minus(selectedPizzaType!!.getPrice())
+            _pizzaPrice.value = _pizzaPrice.value?.minus(selectedPizzaType!!.getPrice())
             selectedPizzaType = null
         }
     }
@@ -239,12 +271,24 @@ class OrderViewModel: ViewModel() {
     }
 
     private fun cancelSelectionsForToppings(){
-        var price = _totalPrice.value ?: 0
+        var price = _pizzaPrice.value ?: 0
         selectedToppingTypes.forEach {
             price -= it.getPrice()
         }
-        _totalPrice.value = price
+        _pizzaPrice.value = price
         selectedToppingTypes.clear()
+    }
+
+    fun addPizzaOrderToCart(){
+        val order = PizzaOrder(
+            selectedPizzaType,
+            selectedDoughType,
+            selectedToppingTypes,
+            _pizzaPrice.value
+        )
+        pizzaOrderList.add(order)
+
+        _totalPrice.value = _pizzaPrice.value?.let { _totalPrice.value?.plus(it) }
     }
 
     private fun postNavigationHandler() {
@@ -252,5 +296,9 @@ class OrderViewModel: ViewModel() {
         _isCancelAllowed.value = orderNavigation.currentCancellationAllowance
         _isBackProgressAllowed.value = orderNavigation.currentBackProgressAllowance
         _isProgressAllowed.value = orderNavigation.progressAllowance
+    }
+
+    fun resetOrder(firstStepOfPizzaSelection: OrderStep) {
+        orderNavigation.reset(firstStepOfPizzaSelection)
     }
 }

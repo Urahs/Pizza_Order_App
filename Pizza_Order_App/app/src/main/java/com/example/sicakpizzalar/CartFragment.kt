@@ -6,20 +6,77 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
-import com.example.sicakpizzalar.databinding.FragmentSummaryBinding
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
+import androidx.recyclerview.widget.RecyclerView
+import com.example.sicakpizzalar.databinding.FragmentCartBinding
+import com.example.sicakpizzalar.databinding.ItemPizzaBinding
+
+
+class CartListDiffCallback(): DiffUtil.ItemCallback<PizzaOrder>() {
+    override fun areItemsTheSame(oldItem: PizzaOrder, newItem: PizzaOrder): Boolean {
+        return oldItem == newItem
+    }
+
+    override fun areContentsTheSame(oldItem: PizzaOrder, newItem: PizzaOrder): Boolean {
+        return oldItem == newItem
+    }
+}
+
+
+class CartListAdapter(): ListAdapter<PizzaOrder, CartListAdapter.CartViewHolder>(CartListDiffCallback()) {
+
+    class CartViewHolder(val binding: ItemPizzaBinding): RecyclerView.ViewHolder(binding.root) {
+
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CartViewHolder {
+        val binding = ItemPizzaBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        val holder = CartViewHolder(binding)
+
+        return holder
+    }
+
+    override fun onBindViewHolder(holder: CartViewHolder, position: Int) {
+        val ctx = holder.itemView.context
+        val order = getItem(position)
+
+        val pizzaName = ctx.getString(order.pizzaType!!.getPizzaTypeNameResourceID())
+        val doughType = ctx.getString(order.doughType!!.getDoughTypeNameResourceID())
+        val pizzaPrice = ctx.getString(R.string.format_price, order.pizzaPrice)
+        var toppings = ""
+        for (i in order.toppingTypes.indices){
+            toppings += ctx.getString(order.toppingTypes.elementAt(i).getToppingsTypeNameResourceID())
+            if(i != order.toppingTypes.size - 1)
+                toppings += "\n"
+        }
+
+        holder.binding.pizzaTypeTV.text = "$pizzaName"
+        //holder.binding.pizzaNumberTV.text = "${order.orderNumber}"
+        holder.binding.pizzaNumberTV.text = "${position+1}"
+        holder.binding.priceTV.text = pizzaPrice
+        holder.binding.doughTypeTV.text = doughType
+        holder.binding.toppingsTV.text = toppings
+    }
+
+}
+
+
 
 class CartFragment : Fragment() {
 
-    private var _binding: FragmentSummaryBinding? = null
+    private var _binding: FragmentCartBinding? = null
     private val binding get() = _binding!!
 
     private val orderViewModel: OrderViewModel by activityViewModels()
+
+    private var listAdapter: CartListAdapter? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        _binding = FragmentSummaryBinding.inflate(inflater, container, false)
+        _binding = FragmentCartBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -30,9 +87,23 @@ class CartFragment : Fragment() {
             onOrderButtonTapped()
         }
 
+        binding.addPizzaButton.setOnClickListener {
+            onAddNewPizzaItemButton()
+        }
+
         orderViewModel.totalPrice.observe(viewLifecycleOwner) { totalPrice ->
             setPriceText(totalPrice)
         }
+
+        listAdapter = CartListAdapter()
+
+        binding.typesRecyclerView.adapter = listAdapter
+        listAdapter!!.submitList(orderViewModel.pizzaOrderList)
+        listAdapter!!.notifyDataSetChanged()
+    }
+
+    private fun onAddNewPizzaItemButton() {
+        orderViewModel.resetOrder(orderViewModel.firstStepOfPizzaSelection)
     }
 
     private fun setPriceText(price: Int) {

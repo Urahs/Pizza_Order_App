@@ -12,9 +12,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.sicakpizzalar.databinding.FragmentDoughTypeBinding
-import com.example.sicakpizzalar.databinding.FragmentInitialBinding
 import com.example.sicakpizzalar.databinding.ItemDoughTypeBinding
-import com.example.sicakpizzalar.databinding.ItemPizzaTypeBinding
 
 class DoughTypeListDiffCallback(private val doughTypeSelectionStateDataSource: (DoughType) -> (Boolean)): DiffUtil.ItemCallback<DoughType>() {
     override fun areItemsTheSame(oldItem: DoughType, newItem: DoughType): Boolean {
@@ -94,7 +92,7 @@ class DoughTypeFragment : Fragment() {
         listAdapter!!.submitList(orderViewModel.doughTypes)
         listAdapter!!.notifyDataSetChanged()
 
-        orderViewModel.totalPrice.value?.let { setPriceText(it) }
+        orderViewModel.pizzaPrice.value?.let { setPriceText(it) }
     }
 
     private fun isDoughTypeSelected(type: DoughType): Boolean {
