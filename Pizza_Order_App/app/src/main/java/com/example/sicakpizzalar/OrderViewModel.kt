@@ -13,6 +13,7 @@ class OrderNavigationItem(val step: OrderStep) {
     var allowsCancellation = false
 
     var progressConditionHandler: NavigationProgressConditionHandler? = null
+    var goBackConditionHandler: PostNavigationHandler? = null
 
     fun allowsProgress(): Boolean {
         return (progressConditionHandler?.invoke() ?: true)
@@ -28,6 +29,7 @@ class OrderNavigation {
     val currentCancellationAllowance get() = items[currentStepIndex].allowsCancellation
     val currentBackProgressAllowance get() = items[currentStepIndex].allowsGoingToPreviousStep
     val progressAllowance get() = items[currentStepIndex].allowsProgress()
+    val cancelCurrentSelection get() = items[currentStepIndex].goBackConditionHandler
 
     private var postNavigationHandlers: MutableList<PostNavigationHandler> = mutableListOf()
 
@@ -44,10 +46,14 @@ class OrderNavigation {
     }
 
     fun goBack() {
+        cancelCurrentSelection?.invoke()
         changeNavigation(currentStepIndex - 1)
     }
 
     fun reset() {
+        items.forEach { item->
+            item.goBackConditionHandler?.invoke()
+        }
         changeNavigation(0)
     }
 
@@ -80,14 +86,20 @@ class OrderViewModel: ViewModel() {
         addItem(
             OrderNavigationItem(OrderStep.PIZZA_TYPE).apply {
                 progressConditionHandler = ::progressFromTypeSelectionAllowed
+                goBackConditionHandler = ::cancelSelectionForPizzaType
             }
         )
         addItem(
             OrderNavigationItem(OrderStep.DOUGH_TYPE).apply {
                 progressConditionHandler = ::progressFromDoughTypeSelectionAllowed
+                goBackConditionHandler = ::cancelSelectionForDoughType
             }
         )
-        addItem(OrderNavigationItem(OrderStep.TOPPINGS))
+        addItem(
+            OrderNavigationItem(OrderStep.TOPPINGS).apply {
+                goBackConditionHandler = ::cancelSelectionsForToppings
+            }
+        )
         addItem(
             OrderNavigationItem(OrderStep.SUMMARY).apply {
                 allowsCancellation = true
@@ -119,7 +131,7 @@ class OrderViewModel: ViewModel() {
         PizzaType.VEGAN
     )
 
-    private var selectedPizzaType: PizzaType? = null
+    var selectedPizzaType: PizzaType? = null
 
     val doughTypes: List<DoughType> = listOf(
         DoughType.THIN,
@@ -127,7 +139,7 @@ class OrderViewModel: ViewModel() {
         DoughType.EXTRA_THICK
     )
 
-    private var selectedDoughType: DoughType? = null
+    var selectedDoughType: DoughType? = null
 
     val toppingTypes: List<ToppingsType> = listOf(
         ToppingsType.CORN,
@@ -137,7 +149,7 @@ class OrderViewModel: ViewModel() {
         ToppingsType.TOMATO
     )
 
-    private val selectedToppingTypes: MutableSet<ToppingsType> = mutableSetOf()
+    val selectedToppingTypes: MutableSet<ToppingsType> = mutableSetOf()
 
     fun progress() {
         orderNavigation.progress()
@@ -208,6 +220,24 @@ class OrderViewModel: ViewModel() {
 
     private fun addToppingPriceToTotalPrice(price: Int) {
         _totalPrice.value = _totalPrice.value?.plus(price)
+    }
+
+    private fun cancelSelectionForPizzaType(){
+        _totalPrice.value = _totalPrice.value?.minus(selectedPizzaType!!.getPrice())
+        selectedPizzaType = null
+    }
+
+    private fun cancelSelectionForDoughType(){
+        selectedDoughType = null
+    }
+
+    private fun cancelSelectionsForToppings(){
+        var price = _totalPrice.value ?: 0
+        selectedToppingTypes.forEach {
+            price -= it.getPrice()
+        }
+        _totalPrice.value = price
+        selectedToppingTypes.clear()
     }
 
     private fun postNavigationHandler() {

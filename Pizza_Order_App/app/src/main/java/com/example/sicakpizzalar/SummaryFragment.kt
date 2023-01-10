@@ -30,6 +30,26 @@ class SummaryFragment : Fragment() {
         binding.orderButton.setOnClickListener {
             onOrderButtonTapped()
         }
+
+        orderViewModel.totalPrice.observe(viewLifecycleOwner) { totalPrice ->
+            setPriceText(totalPrice)
+        }
+
+
+        binding.pizzaTypeTV.text = "${getString(orderViewModel.selectedPizzaType!!.getPizzaTypeNameResourceID())}"
+        binding.doughTypeTV.text = "${getString(orderViewModel.selectedDoughType!!.getDoughTypeNameResourceID())}"
+
+        var toppings = ""
+        orderViewModel.selectedToppingTypes.forEach {
+            toppings += "${getString(it.getToppingsTypeNameResourceID())}\n"
+        }
+        binding.toppingsTV.text = toppings
+    }
+
+    private fun setPriceText(price: Int) {
+        val priceStr = getString(R.string.format_price, price)
+        val totalPrice = getString(R.string.format_total_price, priceStr)
+        binding.priceTV.text = totalPrice
     }
 
     private fun onOrderButtonTapped() {

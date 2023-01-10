@@ -18,7 +18,7 @@
         app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
-        android:id="@+id/textView"
+        android:id="@+id/pizzaTypeTitleTV"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="INITIAL"
