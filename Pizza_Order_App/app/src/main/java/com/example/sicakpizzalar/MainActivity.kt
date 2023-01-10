@@ -70,6 +70,7 @@ class MainActivity : AppCompatActivity() {
             OrderStep.DOUGH_TYPE -> DoughTypeFragment.TAG
             OrderStep.TOPPINGS -> ToppingsFragment.TAG
             OrderStep.SUMMARY -> SummaryFragment.TAG
+            OrderStep.CART -> CartFragment.TAG
         }
     }
 
@@ -80,6 +81,7 @@ class MainActivity : AppCompatActivity() {
             OrderStep.DOUGH_TYPE -> DoughTypeFragment()
             OrderStep.TOPPINGS -> ToppingsFragment()
             OrderStep.SUMMARY -> SummaryFragment()
+            OrderStep.CART -> CartFragment()
         }
     }
 

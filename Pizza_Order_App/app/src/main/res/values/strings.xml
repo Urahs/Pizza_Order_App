@@ -6,6 +6,7 @@
     <string name="title_button_back">Geri</string>
     <string name="title_button_cancel">Iptal</string>
     <string name="title_button_order">Siparis Ver</string>
+    <string name="title_button_add_pizza_item">Ekle ve Sepete Git</string>
 
     <string name="pizza_type_margarita">Margarita</string>
     <string name="pizza_type_pepperoni">Biberli</string>
@@ -23,11 +24,13 @@
     <string name="topping_type_cheese">Peynir</string>
 
     <string name="format_total_price">Toplam Tutar: %1$s</string>
+    <string name="format_pizza_price">Pizza Tutari: %1$s</string>
     <string name="format_price">%1$d YTL</string>
 
     <string name="pizza_type_string">Pizza Tipi</string>
     <string name="dough_type_string">Hamur Tipi</string>
     <string name="toppings_string">Ekstra Malzemeler</string>
+    <string name="pizza_title_string">Pizza</string>
 
 
     <!-- TODO: Remove or change this placeholder text -->

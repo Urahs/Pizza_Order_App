@@ -6,11 +6,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
-import androidx.transition.Visibility
-import com.example.sicakpizzalar.databinding.FragmentInitialBinding
 import com.example.sicakpizzalar.databinding.FragmentSummaryBinding
 
-class SummaryFragment : Fragment() {
+class CartFragment : Fragment() {
 
     private var _binding: FragmentSummaryBinding? = null
     private val binding get() = _binding!!
@@ -35,29 +33,16 @@ class SummaryFragment : Fragment() {
         orderViewModel.totalPrice.observe(viewLifecycleOwner) { totalPrice ->
             setPriceText(totalPrice)
         }
-
-
-        binding.pizzaTypeTV.text = "${getString(orderViewModel.selectedPizzaType!!.getPizzaTypeNameResourceID())}"
-        binding.doughTypeTV.text = "${getString(orderViewModel.selectedDoughType!!.getDoughTypeNameResourceID())}"
-
-        var toppings = ""
-        orderViewModel.selectedToppingTypes.forEach {
-            toppings += "${getString(it.getToppingsTypeNameResourceID())}\n"
-        }
-        binding.toppingsTV.text = toppings
-
-        binding.toppingsTitleTV.visibility = if (orderViewModel.isToppingSelected()) View.VISIBLE else View.GONE
-        binding.toppingsTV.visibility = if (orderViewModel.isToppingSelected()) View.VISIBLE else View.GONE
     }
 
     private fun setPriceText(price: Int) {
         val priceStr = getString(R.string.format_price, price)
-        val totalPrice = getString(R.string.format_pizza_price, priceStr)
+        val totalPrice = getString(R.string.format_total_price, priceStr)
         binding.priceTV.text = totalPrice
     }
 
     private fun onOrderButtonTapped() {
-        orderViewModel.progress()
+        //TODO
     }
 
     override fun onDestroyView() {
@@ -66,6 +51,6 @@ class SummaryFragment : Fragment() {
     }
 
     companion object {
-        val TAG = "SummaryFragment"
+        val TAG = "CartFragment"
     }
 }

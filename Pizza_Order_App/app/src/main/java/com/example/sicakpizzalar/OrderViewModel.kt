@@ -105,6 +105,7 @@ class OrderViewModel: ViewModel() {
                 allowsCancellation = true
             }
         )
+        addItem(OrderNavigationItem(OrderStep.CART))
 
         addPostNavigationHandler(::postNavigationHandler)
     }

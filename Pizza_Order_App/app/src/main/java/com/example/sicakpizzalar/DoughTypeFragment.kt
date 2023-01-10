@@ -110,7 +110,7 @@ class DoughTypeFragment : Fragment() {
 
     private fun setPriceText(price: Int) {
         val priceStr = getString(R.string.format_price, price)
-        val totalPrice = getString(R.string.format_total_price, priceStr)
+        val totalPrice = getString(R.string.format_pizza_price, priceStr)
         binding.priceTV.text = totalPrice
     }
 
