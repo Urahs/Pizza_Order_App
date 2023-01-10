@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.sicakpizzalar.databinding.FragmentCartBinding
 import com.example.sicakpizzalar.databinding.ItemPizzaBinding
 
+typealias AdapterFunctionsSignature = (Int) -> (Unit)
 
 class CartListDiffCallback(): DiffUtil.ItemCallback<PizzaOrder>() {
     override fun areItemsTheSame(oldItem: PizzaOrder, newItem: PizzaOrder): Boolean {
@@ -24,7 +25,10 @@ class CartListDiffCallback(): DiffUtil.ItemCallback<PizzaOrder>() {
 }
 
 
-class CartListAdapter(var deleteItemFromOrderList: (Int) -> (Unit), var editItemFromOrderList: (Int) -> (Unit)): ListAdapter<PizzaOrder, CartListAdapter.CartViewHolder>(CartListDiffCallback()) {
+class CartListAdapter(var deleteItemFromOrderList: AdapterFunctionsSignature,
+                      var editItemFromOrderList: AdapterFunctionsSignature,
+                      var increasePizzaNumber: AdapterFunctionsSignature,
+                      var decreasePizzaNumber: AdapterFunctionsSignature): ListAdapter<PizzaOrder, CartListAdapter.CartViewHolder>(CartListDiffCallback()) {
 
     class CartViewHolder(val binding: ItemPizzaBinding): RecyclerView.ViewHolder(binding.root)
 
@@ -45,12 +49,20 @@ class CartListAdapter(var deleteItemFromOrderList: (Int) -> (Unit), var editItem
             editItemFromOrderList(position)
         }
 
+        holder.binding.increasePizzaAmountTV.setOnClickListener {
+            increasePizzaNumber(position)
+        }
+
+        holder.binding.decreasePizzaAmountTV.setOnClickListener {
+            decreasePizzaNumber(position)
+        }
+
         val ctx = holder.itemView.context
         val order = getItem(position)
 
         val pizzaName = ctx.getString(order.pizzaType!!.getPizzaTypeNameResourceID())
         val doughType = ctx.getString(order.doughType!!.getDoughTypeNameResourceID())
-        val pizzaPrice = ctx.getString(R.string.format_price, order.pizzaPrice)
+        val pizzaPrice = ctx.getString(R.string.format_price, order.pizzaPrice?.times(order.pizzaCount) ?: 0)
         var toppings = ""
         for (i in order.toppingTypes.indices){
             toppings += ctx.getString(order.toppingTypes.elementAt(i).getToppingsTypeNameResourceID())
@@ -63,6 +75,7 @@ class CartListAdapter(var deleteItemFromOrderList: (Int) -> (Unit), var editItem
         holder.binding.priceTV.text = pizzaPrice
         holder.binding.doughTypeTV.text = doughType
         holder.binding.toppingsTV.text = toppings
+        holder.binding.pizzaAmountTV.text = "${order.pizzaCount}"
 
         holder.binding.toppingsTitleTV.visibility = if (order.toppingTypes.size == 0) View.GONE else View.VISIBLE
         holder.binding.toppingsTV.visibility = if (order.toppingTypes.size == 0) View.GONE else View.VISIBLE
@@ -107,7 +120,7 @@ class CartFragment : Fragment() {
             binding.orderButton.isEnabled = allowed
         }
 
-        listAdapter = CartListAdapter(::deleteItem, ::editItem)
+        listAdapter = CartListAdapter(::deleteItem, ::editItem, ::increasePizzaCount, ::decreasePizzaCount)
 
         binding.typesRecyclerView.adapter = listAdapter
         listAdapter!!.submitList(orderViewModel.pizzaOrderList)
@@ -135,6 +148,16 @@ class CartFragment : Fragment() {
 
     private fun editItem(position: Int){
         orderViewModel.editPizzaOrder(position)
+    }
+
+    private fun increasePizzaCount(position: Int){
+        orderViewModel.increasePizzaCount(position)
+        listAdapter!!.notifyDataSetChanged()
+    }
+
+    private fun decreasePizzaCount(position: Int){
+        orderViewModel.decreasePizzaCount(position)
+        listAdapter!!.notifyDataSetChanged()
     }
 
     override fun onDestroyView() {

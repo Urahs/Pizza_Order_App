@@ -124,9 +124,9 @@
 
     <ImageButton
         android:id="@+id/editItemButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="12dp"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:layout_marginEnd="4dp"
         android:contentDescription="edit the item order"
         app:layout_constraintBottom_toBottomOf="@+id/deleteItemButton"
         app:layout_constraintEnd_toStartOf="@+id/deleteItemButton"
@@ -136,12 +136,53 @@
 
     <ImageButton
         android:id="@+id/deleteItemButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
         android:layout_marginTop="8dp"
-        android:layout_marginEnd="16dp"
+        android:layout_marginEnd="8dp"
         android:contentDescription="delete the item order"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@android:drawable/ic_menu_delete" />
+
+    <TextView
+        android:id="@+id/decreasePizzaAmountTV"
+        android:layout_width="30dp"
+        android:layout_height="wrap_content"
+        android:background="#D5D7D7"
+        android:text="-"
+        android:textAlignment="center"
+        android:textColor="@color/black"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toBottomOf="@+id/pizzaAmountTV"
+        app:layout_constraintEnd_toStartOf="@+id/pizzaAmountTV"
+        app:layout_constraintTop_toTopOf="@+id/pizzaAmountTV" />
+
+    <TextView
+        android:id="@+id/pizzaAmountTV"
+        android:layout_width="30dp"
+        android:layout_height="wrap_content"
+        android:background="#A5AAAA"
+        android:text="0"
+        android:textAlignment="center"
+        android:textColor="@color/black"
+        android:textSize="25sp"
+        app:layout_constraintBottom_toBottomOf="@+id/increasePizzaAmountTV"
+        app:layout_constraintEnd_toStartOf="@+id/increasePizzaAmountTV"
+        app:layout_constraintTop_toTopOf="@+id/increasePizzaAmountTV" />
+
+    <TextView
+        android:id="@+id/increasePizzaAmountTV"
+        android:layout_width="30dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="40dp"
+        android:background="#D5D7D7"
+        android:text="+"
+        android:textAlignment="center"
+        android:textColor="@color/black"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toBottomOf="@+id/editItemButton"
+        app:layout_constraintEnd_toStartOf="@+id/editItemButton"
+        app:layout_constraintTop_toTopOf="@+id/editItemButton"
+        app:layout_constraintVertical_bias="0.521" />
 </androidx.constraintlayout.widget.ConstraintLayout>

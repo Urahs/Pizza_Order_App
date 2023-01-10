@@ -106,7 +106,6 @@ class TypeFragment : Fragment() {
     }
 
     private fun processPizzaTypeSelection(type: PizzaType) {
-        Log.d("TypeFragment", "Pizza Selected: $type")
         orderViewModel.selectPizzaType(type)
         listAdapter?.submitList(orderViewModel.pizzaTypes)
         listAdapter?.notifyDataSetChanged()

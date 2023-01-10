@@ -105,7 +105,6 @@ class ToppingsFragment : Fragment() {
     }
 
     private fun processToppingSelection(type: ToppingsType) {
-        Log.d("TypeFragment", "Pizza Selected: $type")
         orderViewModel.selectTopping(type)
         listAdapter?.submitList(orderViewModel.toppingTypes)
         listAdapter?.notifyDataSetChanged()

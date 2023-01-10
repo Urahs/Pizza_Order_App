@@ -14,7 +14,8 @@ data class PizzaOrder(
     var pizzaType: PizzaType?,
     var doughType: DoughType?,
     var toppingTypes: MutableSet<ToppingsType>,
-    var pizzaPrice: Int?
+    var pizzaPrice: Int?,
+    var pizzaCount: Int
 )
 
 class OrderNavigationItem(val step: OrderStep) {
@@ -156,6 +157,7 @@ class OrderViewModel: ViewModel() {
 
     var pizzaOrderList = mutableListOf<PizzaOrder>()
     var editPizzaOrderIndex: Int = -1
+    var pizzaCount = 1
 
     private val _isBackProgressAllowed: MutableLiveData<Boolean> = MutableLiveData(false)
     val isBackProgressAllowed: LiveData<Boolean> = _isBackProgressAllowed
@@ -305,7 +307,8 @@ class OrderViewModel: ViewModel() {
             selectedPizzaType,
             selectedDoughType,
             selectedToppingTypes.toMutableSet(),
-            _pizzaPrice.value
+            _pizzaPrice.value,
+            pizzaCount
         )
 
         if (editPizzaOrderIndex >= 0)
@@ -313,6 +316,8 @@ class OrderViewModel: ViewModel() {
         else
             pizzaOrderList.add(order)
 
+        ////////////////////////////////////////////////////////// TODO
+        pizzaCount = 1
         editPizzaOrderIndex = -1
         _totalPrice.value = _pizzaPrice.value?.let { _totalPrice.value?.plus(it) }
         updateOrderAllowed()
@@ -330,11 +335,8 @@ class OrderViewModel: ViewModel() {
     }
 
     fun deleteOrderFromPizzaOrderList(position: Int){
-        pizzaOrderList.get(position).pizzaPrice?.let {
-            _totalPrice.value = _totalPrice.value!!.minus(it)
-        }
+        _totalPrice.value = _totalPrice.value?.minus((pizzaOrderList[position].pizzaCount * pizzaOrderList[position].pizzaPrice!!))
         pizzaOrderList.removeAt(position)
-
         updateOrderAllowed()
     }
 
@@ -346,9 +348,29 @@ class OrderViewModel: ViewModel() {
         selectedDoughType = pizzaOrderList[position].doughType
         selectedToppingTypes = pizzaOrderList[position].toppingTypes
         _pizzaPrice.value = pizzaOrderList[position].pizzaPrice ?: 0
-        _totalPrice.value = _totalPrice.value?.minus(_pizzaPrice.value!!)
+        _totalPrice.value = _totalPrice.value?.minus((pizzaOrderList[position].pizzaCount * pizzaOrderList[position].pizzaPrice!!))
+        pizzaCount = pizzaOrderList[position].pizzaCount
 
         orderNavigation.callNavigationHandlers()
+    }
+
+    fun increasePizzaCount(position: Int){
+        pizzaOrderList[position].pizzaCount++
+        updateTotalPrice()
+    }
+
+    fun decreasePizzaCount(position: Int){
+        val currentPizzaAmount = pizzaOrderList[position].pizzaCount
+        pizzaOrderList[position].pizzaCount = if(currentPizzaAmount == 1) 1 else currentPizzaAmount - 1
+        updateTotalPrice()
+    }
+
+    private fun updateTotalPrice(){
+        var curentTotalPrice = 0
+        pizzaOrderList.forEach { order->
+            curentTotalPrice += order.pizzaPrice?.times(order.pizzaCount) ?: 0
+        }
+        _totalPrice.value = curentTotalPrice
     }
 
     private fun updateOrderAllowed(){
