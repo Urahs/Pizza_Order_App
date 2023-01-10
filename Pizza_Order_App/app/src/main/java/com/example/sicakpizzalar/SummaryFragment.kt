@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
+import androidx.transition.Visibility
 import com.example.sicakpizzalar.databinding.FragmentInitialBinding
 import com.example.sicakpizzalar.databinding.FragmentSummaryBinding
 
@@ -44,6 +45,9 @@ class SummaryFragment : Fragment() {
             toppings += "${getString(it.getToppingsTypeNameResourceID())}\n"
         }
         binding.toppingsTV.text = toppings
+
+        binding.toppingsTitleTV.visibility = if (orderViewModel.isToppingSelected()) View.VISIBLE else View.GONE
+        binding.toppingsTV.visibility = if (orderViewModel.isToppingSelected()) View.VISIBLE else View.GONE
     }
 
     private fun setPriceText(price: Int) {

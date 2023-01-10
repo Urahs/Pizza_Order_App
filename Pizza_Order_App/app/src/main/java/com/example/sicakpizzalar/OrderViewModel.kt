@@ -179,6 +179,10 @@ class OrderViewModel: ViewModel() {
         return type in selectedToppingTypes
     }
 
+    fun isToppingSelected(): Boolean {
+        return selectedToppingTypes.size != 0
+    }
+
     fun selectPizzaType(type: PizzaType) {
         selectedPizzaType = type
         calculateTotalPriceAndNotifyForPizzaType()
@@ -223,8 +227,10 @@ class OrderViewModel: ViewModel() {
     }
 
     private fun cancelSelectionForPizzaType(){
-        _totalPrice.value = _totalPrice.value?.minus(selectedPizzaType!!.getPrice())
-        selectedPizzaType = null
+        if(selectedPizzaType != null){
+            _totalPrice.value = _totalPrice.value?.minus(selectedPizzaType!!.getPrice())
+            selectedPizzaType = null
+        }
     }
 
     private fun cancelSelectionForDoughType(){
