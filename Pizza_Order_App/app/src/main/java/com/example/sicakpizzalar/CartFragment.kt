@@ -24,11 +24,9 @@ class CartListDiffCallback(): DiffUtil.ItemCallback<PizzaOrder>() {
 }
 
 
-class CartListAdapter(var deleteItemFromOrderList: (Int) -> (Unit)): ListAdapter<PizzaOrder, CartListAdapter.CartViewHolder>(CartListDiffCallback()) {
+class CartListAdapter(var deleteItemFromOrderList: (Int) -> (Unit), var editItemFromOrderList: (Int) -> (Unit)): ListAdapter<PizzaOrder, CartListAdapter.CartViewHolder>(CartListDiffCallback()) {
 
-    class CartViewHolder(val binding: ItemPizzaBinding): RecyclerView.ViewHolder(binding.root) {
-
-    }
+    class CartViewHolder(val binding: ItemPizzaBinding): RecyclerView.ViewHolder(binding.root)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CartViewHolder {
         val binding = ItemPizzaBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -41,6 +39,10 @@ class CartListAdapter(var deleteItemFromOrderList: (Int) -> (Unit)): ListAdapter
 
         holder.binding.deleteItemButton.setOnClickListener {
             deleteItemFromOrderList(position)
+        }
+
+        holder.binding.editItemButton.setOnClickListener {
+            editItemFromOrderList(position)
         }
 
         val ctx = holder.itemView.context
@@ -61,6 +63,9 @@ class CartListAdapter(var deleteItemFromOrderList: (Int) -> (Unit)): ListAdapter
         holder.binding.priceTV.text = pizzaPrice
         holder.binding.doughTypeTV.text = doughType
         holder.binding.toppingsTV.text = toppings
+
+        holder.binding.toppingsTitleTV.visibility = if (order.toppingTypes.size == 0) View.GONE else View.VISIBLE
+        holder.binding.toppingsTV.visibility = if (order.toppingTypes.size == 0) View.GONE else View.VISIBLE
     }
 }
 
@@ -102,7 +107,7 @@ class CartFragment : Fragment() {
             binding.orderButton.isEnabled = allowed
         }
 
-        listAdapter = CartListAdapter(::deleteItem)
+        listAdapter = CartListAdapter(::deleteItem, ::editItem)
 
         binding.typesRecyclerView.adapter = listAdapter
         listAdapter!!.submitList(orderViewModel.pizzaOrderList)
@@ -126,6 +131,10 @@ class CartFragment : Fragment() {
     private fun deleteItem(position: Int){
         orderViewModel.deleteOrderFromPizzaOrderList(position)
         listAdapter!!.notifyDataSetChanged()
+    }
+
+    private fun editItem(position: Int){
+        orderViewModel.editPizzaOrder(position)
     }
 
     override fun onDestroyView() {

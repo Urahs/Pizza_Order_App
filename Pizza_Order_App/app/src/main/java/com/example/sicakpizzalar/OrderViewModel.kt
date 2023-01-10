@@ -95,6 +95,10 @@ class OrderNavigation {
 
         currentStepIndex = targetIndex
 
+        callNavigationHandlers()
+    }
+
+    fun callNavigationHandlers(){
         postNavigationHandlers.forEach { handler ->
             handler()
         }
@@ -151,6 +155,7 @@ class OrderViewModel: ViewModel() {
     }
 
     var pizzaOrderList = mutableListOf<PizzaOrder>()
+    var editPizzaOrderIndex: Int = -1
 
     private val _isBackProgressAllowed: MutableLiveData<Boolean> = MutableLiveData(false)
     val isBackProgressAllowed: LiveData<Boolean> = _isBackProgressAllowed
@@ -198,7 +203,7 @@ class OrderViewModel: ViewModel() {
         ToppingsType.TOMATO
     )
 
-    val selectedToppingTypes: MutableSet<ToppingsType> = mutableSetOf()
+    var selectedToppingTypes: MutableSet<ToppingsType> = mutableSetOf()
 
     fun progress() {
         orderNavigation.progress()
@@ -302,8 +307,13 @@ class OrderViewModel: ViewModel() {
             selectedToppingTypes.toMutableSet(),
             _pizzaPrice.value
         )
-        pizzaOrderList.add(order)
 
+        if (editPizzaOrderIndex >= 0)
+            pizzaOrderList.set(editPizzaOrderIndex, order)
+        else
+            pizzaOrderList.add(order)
+
+        editPizzaOrderIndex = -1
         _totalPrice.value = _pizzaPrice.value?.let { _totalPrice.value?.plus(it) }
         updateOrderAllowed()
     }
@@ -326,6 +336,19 @@ class OrderViewModel: ViewModel() {
         pizzaOrderList.removeAt(position)
 
         updateOrderAllowed()
+    }
+
+    fun editPizzaOrder(position: Int){
+        editPizzaOrderIndex = position
+        orderNavigation.reset()
+
+        selectedPizzaType = pizzaOrderList[position].pizzaType
+        selectedDoughType = pizzaOrderList[position].doughType
+        selectedToppingTypes = pizzaOrderList[position].toppingTypes
+        _pizzaPrice.value = pizzaOrderList[position].pizzaPrice ?: 0
+        _totalPrice.value = _totalPrice.value?.minus(_pizzaPrice.value!!)
+
+        orderNavigation.callNavigationHandlers()
     }
 
     private fun updateOrderAllowed(){
