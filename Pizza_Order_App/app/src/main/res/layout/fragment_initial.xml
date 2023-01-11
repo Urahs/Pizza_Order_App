@@ -36,7 +36,7 @@
         android:id="@+id/pizzaTypeTitleTV"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="ScoPizza"
+        android:text="ScorPizza"
         android:textColor="@color/black"
         android:textSize="40sp"
         app:layout_constraintBottom_toBottomOf="parent"

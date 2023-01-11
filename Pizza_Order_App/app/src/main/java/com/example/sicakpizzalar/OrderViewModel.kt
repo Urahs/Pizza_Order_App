@@ -148,11 +148,7 @@ class OrderViewModel: ViewModel() {
                 allowsCancellation = true
             }
         )
-        addItem(
-            OrderNavigationItem(OrderStep.ADDRESS).apply {
-                allowsGoingToPreviousStep = false
-            }
-        )
+        addItem(OrderNavigationItem(OrderStep.ADDRESS))
 
         addPostNavigationHandler(::postNavigationHandler)
         clearOrderList = ::clearOrders
@@ -391,6 +387,11 @@ class OrderViewModel: ViewModel() {
     }
 
     fun openCartScreen(){
+        if (editPizzaOrderIndex >= 0){
+            _totalPrice.value = _totalPrice.value!!.plus(pizzaOrderList[editPizzaOrderIndex].pizzaCount * pizzaOrderList[editPizzaOrderIndex].pizzaPrice!!)
+            editPizzaOrderIndex = -1
+        }
+
         orderNavigation.openCartScreen()
     }
 
