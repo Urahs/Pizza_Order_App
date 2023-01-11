@@ -71,6 +71,7 @@ class MainActivity : AppCompatActivity() {
             OrderStep.TOPPINGS -> ToppingsFragment.TAG
             OrderStep.SUMMARY -> SummaryFragment.TAG
             OrderStep.CART -> CartFragment.TAG
+            OrderStep.ADDRESS -> AddressFragment.TAG
         }
     }
 
@@ -82,6 +83,7 @@ class MainActivity : AppCompatActivity() {
             OrderStep.TOPPINGS -> ToppingsFragment()
             OrderStep.SUMMARY -> SummaryFragment()
             OrderStep.CART -> CartFragment()
+            OrderStep.ADDRESS -> AddressFragment()
         }
     }
 

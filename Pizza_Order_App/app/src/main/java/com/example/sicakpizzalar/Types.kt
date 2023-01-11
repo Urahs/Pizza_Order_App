@@ -6,7 +6,8 @@ enum class OrderStep {
     DOUGH_TYPE,
     TOPPINGS,
     SUMMARY,
-    CART
+    CART,
+    ADDRESS
 }
 
 enum class PizzaType {

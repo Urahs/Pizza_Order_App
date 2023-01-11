@@ -6,6 +6,9 @@
     <string name="title_button_back">Geri</string>
     <string name="title_button_cancel">Iptal</string>
     <string name="title_button_order">Siparis Ver</string>
+    <string name="title_button_address">Adres Gir</string>
+    <string name="title_address_information">Adres Bilgisi</string>
+    <string name="address">Adres</string>
     <string name="title_button_go_cart">Sepete Git</string>
     <string name="title_button_add_new_pizza">Yeni Pizza Ekle</string>
     <string name="title_button_add_pizza_item">Ekle ve Sepete Git</string>
@@ -34,8 +37,11 @@
     <string name="toppings_string">Ekstra Malzemeler</string>
     <string name="pizza_title_string">Pizza</string>
 
+    <string name="address_required">lutfen adresinizi giriniz!</string>
+
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="order_approved">Siparisiniz yola cikmistir. Simdiden afiyet olsun...</string>
 
 </resources>

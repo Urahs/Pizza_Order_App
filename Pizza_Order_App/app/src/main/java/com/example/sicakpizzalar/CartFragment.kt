@@ -104,8 +104,8 @@ class CartFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.orderButton.setOnClickListener {
-            onOrderButtonTapped()
+        binding.addressButton.setOnClickListener {
+            onAddressButtonTapped()
         }
 
         binding.addPizzaButton.setOnClickListener {
@@ -117,7 +117,7 @@ class CartFragment : Fragment() {
         }
 
         orderViewModel.isOrderAllowed.observe(viewLifecycleOwner) { allowed ->
-            binding.orderButton.isEnabled = allowed
+            binding.addressButton.isEnabled = allowed
         }
 
         listAdapter = CartListAdapter(::deleteItem, ::editItem, ::increasePizzaCount, ::decreasePizzaCount)
@@ -137,8 +137,8 @@ class CartFragment : Fragment() {
         binding.priceTV.text = totalPrice
     }
 
-    private fun onOrderButtonTapped() {
-        //TODO
+    private fun onAddressButtonTapped() {
+        orderViewModel.progress()
     }
 
     private fun deleteItem(position: Int){

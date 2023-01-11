@@ -64,7 +64,7 @@ class OrderNavigation {
 
     fun cancel() {
 
-        if(items[currentStepIndex].step == cartStep){
+        if(items[currentStepIndex].step == cartStep || currentStepIndex == items.size-1){
             clearOrderList?.invoke()
         }
 
@@ -146,6 +146,11 @@ class OrderViewModel: ViewModel() {
             OrderNavigationItem(OrderStep.CART).apply {
                 allowsGoingToPreviousStep = false
                 allowsCancellation = true
+            }
+        )
+        addItem(
+            OrderNavigationItem(OrderStep.ADDRESS).apply {
+                allowsGoingToPreviousStep = false
             }
         )
 
