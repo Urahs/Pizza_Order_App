@@ -24,7 +24,6 @@ class ToppingsListDiffCallback(private val toppingsSelectionStateDataSource: (To
     }
 }
 
-
 class ToppingsListAdapter(private val toppingsSelectionStateDataSource: (ToppingsType) -> (Boolean),
                            private val itemSelectionHandler: (ToppingsType) -> (Unit)): ListAdapter<ToppingsType, ToppingsListAdapter.ToppingsViewHolder>(ToppingsListDiffCallback(toppingsSelectionStateDataSource)) {
 

@@ -24,7 +24,6 @@ class CartListDiffCallback(): DiffUtil.ItemCallback<PizzaOrder>() {
     }
 }
 
-
 class CartListAdapter(var deleteItemFromOrderList: AdapterFunctionsSignature,
                       var editItemFromOrderList: AdapterFunctionsSignature,
                       var increasePizzaNumber: AdapterFunctionsSignature,

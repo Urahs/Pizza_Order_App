@@ -14,7 +14,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.sicakpizzalar.databinding.FragmentTypeBinding
 import com.example.sicakpizzalar.databinding.ItemPizzaTypeBinding
 
-
 class PizzaTypeListDiffCallback(private val typeSelectionStateDataSource: (PizzaType) -> (Boolean)): DiffUtil.ItemCallback<PizzaType>() {
     override fun areItemsTheSame(oldItem: PizzaType, newItem: PizzaType): Boolean {
         return oldItem == newItem
@@ -24,7 +23,6 @@ class PizzaTypeListDiffCallback(private val typeSelectionStateDataSource: (Pizza
         return typeSelectionStateDataSource(oldItem) == typeSelectionStateDataSource(newItem)
     }
 }
-
 
 class PizzaTypeListAdapter(private val typeSelectionStateDataSource: (PizzaType) -> (Boolean),
                            private val itemSelectionHandler: (PizzaType) -> (Unit)): ListAdapter<PizzaType, PizzaTypeListAdapter.PizzaTypeViewHolder>(PizzaTypeListDiffCallback(typeSelectionStateDataSource)) {
